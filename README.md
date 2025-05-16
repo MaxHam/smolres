@@ -30,7 +30,7 @@ smolres --help
 
 ### Core functionality
 
--[] Basic CLI setup with clap for argument parsing.
+-[x] Basic CLI setup with clap for argument parsing.
 -[] Decode PNG/JPEG to raw RGB (using png or jpeg-decoder).
 -[] Implement pixelation algorithm (downscale to a virtual grid, then upscale).
 -[] Implement output saving (as PNG, or optionally PPM).
