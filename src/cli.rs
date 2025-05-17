@@ -16,7 +16,7 @@ pub struct Args {
 
     // Scale of virtualized resolution
     #[arg(short, long, default_value_t = 16)]
-    pub resolution: u8,
+    pub resolution: u16,
     // Color depth of individual pixelds
     #[arg(short, long, default_value_t = 2)]
     pub bit_depth: u8,
