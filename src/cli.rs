@@ -1,6 +1,6 @@
 use clap::Parser;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Parser, Debug)]
 #[command(name = "smolres")]
@@ -12,7 +12,7 @@ pub struct Args {
 
     // Path to output image file
     #[arg(short, long, value_parser=validate_output_path)]
-    pub output: PathBuf,
+    pub output: Option<PathBuf>,
 
     // Scale of virtualized resolution
     #[arg(short, long, default_value_t = 16)]
@@ -20,6 +20,14 @@ pub struct Args {
     // Color depth of individual pixelds
     #[arg(short, long, default_value_t = 2)]
     pub bit_depth: u8,
+}
+
+pub fn default_output_path(input: &PathBuf, resolution: u16) -> PathBuf {
+    let parent = input.parent().unwrap_or_else(|| Path::new(""));
+    let stem = input.file_stem().unwrap_or_default().to_string_lossy();
+    let ext = input.extension().and_then(|e| e.to_str()).unwrap_or("jpeg"); // fallback if extension is missing or not valid UTF-8
+    let filename = format!("{}_res{}.{}", stem, resolution, ext);
+    parent.join(filename)
 }
 
 /**

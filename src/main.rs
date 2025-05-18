@@ -4,7 +4,7 @@ mod encoder;
 mod interpolation;
 
 use clap::Parser;
-use cli::Args;
+use cli::{Args, default_output_path};
 use decoder::decode;
 use encoder::encode;
 use interpolation::{down_sample_average_area, up_sample_nearest_neighbor};
@@ -23,6 +23,10 @@ pub enum UserFacingError {
 fn main() -> Result<(), UserFacingError> {
     let args = Args::parse();
 
+    let output = args
+        .output
+        .clone()
+        .unwrap_or_else(|| default_output_path(&args.input, args.resolution));
     // Decode image file
     let (pixel_vec, metadata) = decode(&args.input);
     // Transform
@@ -45,11 +49,6 @@ fn main() -> Result<(), UserFacingError> {
     )?;
 
     // encode to back image file
-    encode(
-        upsampled_pixel_vec,
-        metadata.height,
-        metadata.width,
-        &args.output,
-    );
+    encode(upsampled_pixel_vec, metadata.height, metadata.width, output);
     Ok(())
 }
