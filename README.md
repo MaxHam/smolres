@@ -30,13 +30,12 @@ smolres --help
 
 ### Core functionality
 
--[x] Basic CLI setup with clap for argument parsing.
--[] Decode PNG/JPEG to raw RGB (using png or jpeg-decoder).
--[] Implement pixelation algorithm (downscale to a virtual grid, then upscale).
--[] Implement output saving (as PNG, or optionally PPM).
--[] Implement grayscale conversion for retro look (optional flag).
--[] Implement bit-depth reduction (2-bit, 4-bit color quantization).
--[] Handle basic error cases (invalid files, missing arguments).
+- [x] Basic CLI setup with clap for argument parsing.
+- [x] Decode JPEG to raw RGB (using png or jpeg-decoder).
+- [x] Implement pixelation algorithm (downscale to a virtual grid, then upscale).
+- [x] Implement output saving (as JPEG).
+- [x] Handle basic error cases (invalid files, missing arguments).
+- [] Implement bit-depth reduction (2-bit, 4-bit color quantization).
 
 ### Advanced features
 
@@ -44,4 +43,3 @@ smolres --help
 -[] Add progress bar (using indicatif).
 -[] Improve color palette management (for 2-bit/4-bit output).
 -[] Add a logging system for detailed outputs (tracing or log crate).
--[] Allow custom aspect ratio pixelation (e.g., 16x9 instead of square grids).
