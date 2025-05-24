@@ -8,13 +8,25 @@ This projects purpose is to learn Rust for me.
 
 ## Example
 
-### Before
+<table>
+  <tr>
+    <td>
+
+**Before**
 
 ![Before Image](examples/horse_3.jpeg)
 
-### After (Resolution 32)
+</td>
+<td>
+
+**After (Resolution 32)**
 
 ![After Image](examples/horse_3_res32.jpeg)
+
+</td>
+
+  </tr>
+</table>
 
 ## How to install
 
