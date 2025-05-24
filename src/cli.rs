@@ -79,12 +79,10 @@ fn validate_file_extension(path: &PathBuf) -> Result<&PathBuf, String> {
 
     return Ok(path);
 }
-
 #[cfg(test)]
 mod tests {
     use std::env;
     use std::fs;
-    use std::path::PathBuf;
 
     use crate::cli::validate_existance;
     use crate::cli::validate_file_extension;

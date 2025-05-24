@@ -7,22 +7,16 @@ use clap::Parser;
 use cli::{Args, default_output_path};
 use decoder::decode;
 use encoder::encode;
-use interpolation::{down_sample_average_area, up_sample_nearest_neighbor};
+use interpolation::{NearestNeighborInterpolation, run_interpolation};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum UserFacingError {
-    #[error("Failed to transform image: {0}")]
-    DownsamplingError(#[from] interpolation::DownsamplingError),
-    #[error("Failed to transform image: {0}")]
-    UpsamplingError(#[from] interpolation::UpsamplingError),
-    #[error("Unknown error: {0}")]
-    Other(String),
+    #[error("Failed to interpolate image: {0}")]
+    InterpolationError(#[from] interpolation::InterpolationError),
 }
 
-fn main() -> Result<(), UserFacingError> {
-    let args = Args::parse();
-
+fn run(args: Args) -> Result<(), UserFacingError> {
     let output = args
         .output
         .clone()
@@ -30,23 +24,19 @@ fn main() -> Result<(), UserFacingError> {
 
     let (pixel_vec, metadata) = decode(&args.input);
 
-    let downsampled_pixel_vec: Vec<u8> = down_sample_average_area(
+    let interpolated_pixels: Vec<u8> = run_interpolation(
+        &NearestNeighborInterpolation,
         pixel_vec,
-        metadata.width.into(),
-        metadata.height.into(),
-        args.resolution.into(),
-        args.resolution.into(),
-        metadata.pixel_format,
+        args.resolution,
+        metadata,
     )?;
-    let upsampled_pixel_vec: Vec<u8> = up_sample_nearest_neighbor(
-        downsampled_pixel_vec,
-        args.resolution.into(),
-        args.resolution.into(),
-        metadata.height.into(),
-        metadata.width.into(),
-        metadata.pixel_format,
-    )?;
+    println!("{}", interpolated_pixels[0]);
+    encode(interpolated_pixels, metadata.height, metadata.width, output);
+    Ok(())
+}
 
-    encode(upsampled_pixel_vec, metadata.height, metadata.width, output);
+fn main() -> Result<(), UserFacingError> {
+    let args = Args::parse();
+    let _ = run(args);
     Ok(())
 }
