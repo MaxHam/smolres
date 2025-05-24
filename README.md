@@ -6,12 +6,22 @@ smolres is a Rust CLI tool that pixelates images by reducing their resolution an
 
 This projects purpose is to learn Rust for me.
 
+## Example
+
+### Before
+
+![Before Image](examples/horse_3.jpeg)
+
+### After (Resolution 32)
+
+![After Image](examples/horse_3_res32.jpeg)
+
 ## How to install
 
 1. Build the project
 
 ```shell
-cargo install --path .
+cargo build
 ```
 
 2. Install it globally. If you want to use smolres from anywhere:
@@ -24,6 +34,8 @@ cargo install --path .
 
 ```shell
 smolres --help
+smolres --input ./data/input_image.jpeg --resolution 32
+
 ```
 
 ## Roadmap
@@ -35,11 +47,10 @@ smolres --help
 - [x] Implement pixelation algorithm (downscale to a virtual grid, then upscale).
 - [x] Implement output saving (as JPEG).
 - [x] Handle basic error cases (invalid files, missing arguments).
-- [] Implement bit-depth reduction (2-bit, 4-bit color quantization).
+- [ ] Implement bit-depth reduction (2-bit, 4-bit color quantization).
 
 ### Advanced features
 
--[] Add batch processing (process an entire folder of images).
--[] Add progress bar (using indicatif).
--[] Improve color palette management (for 2-bit/4-bit output).
--[] Add a logging system for detailed outputs (tracing or log crate).
+- [ ] Add batch processing (process an entire folder of images).
+- [ ] Add progress bar (using indicatif).
+- [ ] Add other interpolation algorithms

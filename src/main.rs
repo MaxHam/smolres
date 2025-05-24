@@ -27,9 +27,9 @@ fn main() -> Result<(), UserFacingError> {
         .output
         .clone()
         .unwrap_or_else(|| default_output_path(&args.input, args.resolution));
-    // Decode image file
+
     let (pixel_vec, metadata) = decode(&args.input);
-    // Transform
+
     let downsampled_pixel_vec: Vec<u8> = down_sample_average_area(
         pixel_vec,
         metadata.width.into(),
@@ -38,7 +38,6 @@ fn main() -> Result<(), UserFacingError> {
         args.resolution.into(),
         metadata.pixel_format,
     )?;
-
     let upsampled_pixel_vec: Vec<u8> = up_sample_nearest_neighbor(
         downsampled_pixel_vec,
         args.resolution.into(),
@@ -48,7 +47,6 @@ fn main() -> Result<(), UserFacingError> {
         metadata.pixel_format,
     )?;
 
-    // encode to back image file
     encode(upsampled_pixel_vec, metadata.height, metadata.width, output);
     Ok(())
 }
