@@ -66,3 +66,4 @@ smolres --input ./data/input_image.jpeg --resolution 32
 - [ ] Add batch processing (process an entire folder of images).
 - [ ] Add progress bar (using indicatif).
 - [ ] Add other interpolation algorithms
+- [ ] Add other file types .png, .jpg, ..

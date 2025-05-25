@@ -150,16 +150,65 @@ impl InterpolationAlgorithm for NearestNeighborInterpolation {
         target_height: usize,
         pixel_format: PixelFormat,
     ) -> Result<Vec<u8>, InterpolationError> {
+        // original_height = input_image.height
+        // original_width = input_image.width
+        //
+        // # Create an empty image with new dimensions
+        // output_image = create_empty_image(new_width, new_height)
+        //
+        // # Calculate the scale factors
+        // x_scale = original_width / new_width
+        // y_scale = original_height / new_height
+        //
+        // for y_new from 0 to new_height - 1:
+        //     for x_new from 0 to new_width - 1:
+        //
+        // # Map coordinates in the output image back to the nearest input pixel
+        // x_old = floor(x_new * x_scale)
+        // y_old = floor(y_new * y_scale)
+        //
+        // # Assign the nearest pixel value
+        // output_image[y_new][x_new] = input_image[y_old][x_old]
         // TODO: implement this
-        let result = AverageAreaInterpolation.downsample(
-            src_pixels,
-            src_width,
-            src_height,
-            target_width,
-            target_height,
-            pixel_format,
-        )?;
-        Ok(result)
+        if target_height > src_height || target_width > src_width {
+            return Err(InterpolationError::DownsampleTargetLargerThanSource(
+                format!(
+                    "Target Height {} > Source Height {}. For the downsampling to be reliable the target resolution has to be lower than the source resolution",
+                    target_height, src_height,
+                ),
+            ));
+        }
+        if target_width > src_width {
+            return Err(InterpolationError::DownsampleTargetLargerThanSource(
+                format!(
+                    "Target Width {} > Source Width {}. For the downsampling to be reliable the target resolution has to be lower than the source resolution",
+                    target_width, src_width,
+                ),
+            ));
+        }
+        let pixel_bytes: usize = pixel_format
+            .pixel_bytes()
+            .try_into()
+            .map_err(|_e: Infallible| InterpolationError::ImageMetadataResolve)?;
+
+        let mut target_pixels: Vec<u8> = vec![0u8; target_width * target_height * pixel_bytes];
+        let scale_x = src_width / target_width;
+        let scale_y = src_height / target_height;
+        for y in 0..target_height {
+            for x in 0..target_width {
+                // clamp the coords so no overflow at the edges occurs.
+                let original_x = (((x * scale_x) as f64).floor() as usize).min(src_width - 1);
+                let original_y = (((y * scale_y) as f64).floor() as usize).min(src_height - 1);
+
+                let src_idx = (original_y * src_width + original_x) * pixel_bytes;
+                let out_idx = (y * target_width + x) * pixel_bytes;
+
+                target_pixels[out_idx] = src_pixels[src_idx];
+                target_pixels[out_idx + 1] = src_pixels[src_idx + 1];
+                target_pixels[out_idx + 2] = src_pixels[src_idx + 2];
+            }
+        }
+        Ok(target_pixels)
     }
 
     fn upsample(
