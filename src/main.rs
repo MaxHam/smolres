@@ -40,7 +40,6 @@ pub fn run(args: Args) -> Result<(), UserFacingError> {
         args.resolution,
         metadata,
     )?;
-    println!("{}", interpolated_pixels[0]);
     encode(interpolated_pixels, metadata.height, metadata.width, output);
     Ok(())
 }
