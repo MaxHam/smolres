@@ -128,15 +128,52 @@ impl InterpolationAlgorithm for AverageAreaInterpolation {
         target_height: usize,
         pixel_format: PixelFormat,
     ) -> Result<Vec<u8>, InterpolationError> {
-        let result = NearestNeighborInterpolation.upsample(
-            src_pixels,
-            src_width,
-            src_height,
-            target_width,
-            target_height,
-            pixel_format,
-        )?;
-        Ok(result)
+        // Average area sampling is commonly only used for downsampling, but it can also be used for upsampling by using inverse mapping
+
+        let pixel_bytes: usize = pixel_format
+            .pixel_bytes()
+            .try_into()
+            .map_err(|_e: Infallible| InterpolationError::ImageMetadataResolve)?;
+
+        let mut target_pixels: Vec<u8> =
+            Vec::with_capacity(target_height * target_width * pixel_bytes);
+        let scale_x = src_width as f64 / target_width as f64;
+        let scale_y = src_height as f64 / target_height as f64;
+        for y_target in 0..target_height {
+            for x_target in 0..target_width {
+                let x_start: f64 = x_target as f64 * scale_x;
+                let x_end: f64 = (x_target + 1) as f64 * scale_x;
+
+                let y_start: f64 = y_target as f64 * scale_y;
+                let y_end = (y_target + 1) as f64 * scale_y;
+
+                // convert float bounds to specific pixels
+                let x0: usize = x_start.floor() as usize;
+                let x1: usize = x_end.ceil() as usize;
+                let y0: usize = y_start.floor() as usize;
+                let y1: usize = y_end.ceil() as usize;
+
+                let mut r_sum: usize = 0;
+                let mut g_sum: usize = 0;
+                let mut b_sum: usize = 0;
+                let mut count = 0;
+                for block_y in y0..y1 {
+                    for block_x in x0..x1 {
+                        let idx = (block_y * src_width + block_x) * pixel_bytes;
+                        r_sum += src_pixels[idx] as usize;
+                        g_sum += src_pixels[idx + 1] as usize;
+                        b_sum += src_pixels[idx + 2] as usize;
+                        count += 1;
+                    }
+                }
+
+                // compute the average
+                target_pixels.push((r_sum / &count) as u8);
+                target_pixels.push((g_sum / &count) as u8);
+                target_pixels.push((b_sum / &count) as u8);
+            }
+        }
+        Ok(target_pixels)
     }
 }
 
