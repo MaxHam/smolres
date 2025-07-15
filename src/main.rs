@@ -38,6 +38,7 @@ pub fn run(args: Args) -> Result<(), UserFacingError> {
         chosen_interpolation_algo,
         pixel_vec,
         args.resolution,
+        args.bit_depth,
         metadata,
     )?;
     encode(interpolated_pixels, metadata.height, metadata.width, output);

@@ -14,14 +14,14 @@ This projects purpose is to learn Rust for me.
 
 **Before**
 
-![Before Image](examples/horse_3.jpeg)
+![Before Image](examples/horse.jpeg)
 
 </td>
 <td>
 
 **Nearest Neighbor (Resolution 32)**
 
-![After Image](examples/horse_res32_nearest.jpeg.jpeg)
+![After Image](examples/horse_res32_nearest.jpeg)
 
 </td>
 

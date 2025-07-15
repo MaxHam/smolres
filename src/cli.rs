@@ -19,7 +19,7 @@ pub struct Args {
     #[arg(short, long, default_value_t = 16)]
     pub resolution: u16,
     // Color depth of individual pixelds
-    #[arg(short, long, default_value_t = 2)]
+    #[arg(short, long, default_value_t = 8, value_parser=validate_bit_depth)]
     pub bit_depth: u8,
 
     // Algorithm to be used for the pixel interpolation
@@ -96,6 +96,13 @@ fn validate_file_extension(path: &PathBuf) -> Result<&PathBuf, String> {
     }
 
     return Ok(path);
+}
+
+fn validate_bit_depth(s: &str) -> Result<u8, String> {
+    match s.parse::<u8>() {
+        Ok(value) if (1..=8).contains(&value) => Ok(value),
+        _ => Err(String::from("bit_depth must be an integer between 1 and 8")),
+    }
 }
 #[cfg(test)]
 mod tests {

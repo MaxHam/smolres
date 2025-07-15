@@ -224,10 +224,19 @@ impl InterpolationAlgorithm for NearestNeighborInterpolation {
     }
 }
 
+pub fn reduce_bit_depth(pixels: &mut [u8], bit_depth: u8) {
+    let levels = 1 << bit_depth;
+    let step = (256u16 / levels as u16) as u8;
+    for byte in pixels.iter_mut() {
+        *byte = (*byte / step) * step;
+    }
+}
+
 pub fn run_interpolation(
     algo: &dyn InterpolationAlgorithm,
     src: Vec<u8>,
     target_resolution: u16,
+    target_bit_depth: u8,
     metadata: ImageInfo,
 ) -> Result<Vec<u8>, InterpolationError> {
     let src_width = metadata.width;
@@ -240,19 +249,21 @@ pub fn run_interpolation(
         target_resolution.into(),
         metadata.pixel_format,
     )?;
-    algo.upsample(
+    let mut target_pixels = algo.upsample(
         downsampled_pixels,
         target_resolution.into(),
         target_resolution.into(),
         src_width.into(),
         src_height.into(),
         metadata.pixel_format,
-    )
+    )?;
+    reduce_bit_depth(&mut target_pixels, target_bit_depth);
+    Ok(target_pixels)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{NearestNeighborInterpolation, run_interpolation};
+    use super::{NearestNeighborInterpolation, reduce_bit_depth, run_interpolation};
     use crate::interpolation::AverageAreaInterpolation;
     use jpeg_decoder::{CodingProcess, ImageInfo, PixelFormat};
 
@@ -263,6 +274,7 @@ mod tests {
         let pixel_format = 3;
         let mock_pixels: Vec<u8> = vec![128u8; width * height * pixel_format];
         let original_pixels = mock_pixels.clone();
+        let target_bit_depth = 8;
         let metadata = ImageInfo {
             width: width as u16,
             height: height as u16,
@@ -274,6 +286,7 @@ mod tests {
             &NearestNeighborInterpolation,
             mock_pixels,
             target_resolution,
+            target_bit_depth,
             metadata,
         )
         .unwrap();
@@ -294,13 +307,28 @@ mod tests {
             coding_process: CodingProcess::DctSequential,
         };
         let target_resolution = 2;
+        let target_bit_depth = 8;
         let result_pixels = run_interpolation(
             &AverageAreaInterpolation,
             mock_pixels,
             target_resolution,
+            target_bit_depth,
             metadata,
         )
         .unwrap();
         assert_eq!(result_pixels.len(), original_pixels.len());
+    }
+
+    #[test]
+    fn test_reduce_bit_depth() {
+        let mut pixels = vec![255, 128, 64, 32, 16, 0];
+
+        // 2-bit depth -> 4 levels -> step = 64
+        // Expected values: 255 -> 192, 128 -> 128, 64 -> 64, etc.
+        // (x / 64) * 64 = quantized value
+        reduce_bit_depth(&mut pixels, 2);
+
+        let expected = vec![192, 128, 64, 0, 0, 0];
+        assert_eq!(pixels, expected);
     }
 }
