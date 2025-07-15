@@ -13,6 +13,9 @@ pub enum InterpolationError {
 
     #[error("Failed to resolve image metadata")]
     ImageMetadataResolve,
+
+    #[error("Bit depth must be between 1 and 8, got: {0}")]
+    InvalidBitDepth(u8),
 }
 pub trait InterpolationAlgorithm {
     fn downsample(
@@ -224,12 +227,17 @@ impl InterpolationAlgorithm for NearestNeighborInterpolation {
     }
 }
 
-pub fn reduce_bit_depth(pixels: &mut [u8], bit_depth: u8) {
+pub fn reduce_bit_depth(pixels: &mut [u8], bit_depth: u8) -> Result<Vec<u8>, InterpolationError> {
+    if bit_depth == 0 || bit_depth > 8 {
+        return Err(InterpolationError::InvalidBitDepth(bit_depth));
+    }
+
     let levels = 1 << bit_depth;
     let step = (256u16 / levels as u16) as u8;
     for byte in pixels.iter_mut() {
         *byte = (*byte / step) * step;
     }
+    Ok(pixels.to_vec())
 }
 
 pub fn run_interpolation(
@@ -257,8 +265,7 @@ pub fn run_interpolation(
         src_height.into(),
         metadata.pixel_format,
     )?;
-    reduce_bit_depth(&mut target_pixels, target_bit_depth);
-    Ok(target_pixels)
+    reduce_bit_depth(&mut target_pixels, target_bit_depth)
 }
 
 #[cfg(test)]
@@ -326,9 +333,23 @@ mod tests {
         // 2-bit depth -> 4 levels -> step = 64
         // Expected values: 255 -> 192, 128 -> 128, 64 -> 64, etc.
         // (x / 64) * 64 = quantized value
-        reduce_bit_depth(&mut pixels, 2);
+        let _ = reduce_bit_depth(&mut pixels, 2);
 
         let expected = vec![192, 128, 64, 0, 0, 0];
         assert_eq!(pixels, expected);
+    }
+
+    #[test]
+    #[should_panic(expected = "bit_depth must be between 1 and 8")]
+    fn test_reduce_bit_depth_too_low() {
+        let mut pixels = vec![0, 128, 255];
+        let _ = reduce_bit_depth(&mut pixels, 0); // Invalid bit depth
+    }
+
+    #[test]
+    #[should_panic(expected = "bit_depth must be between 1 and 8")]
+    fn test_reduce_bit_depth_too_high() {
+        let mut pixels = vec![0, 128, 255];
+        let _ = reduce_bit_depth(&mut pixels, 9); // Invalid bit depth
     }
 }
