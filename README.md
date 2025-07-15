@@ -12,7 +12,7 @@ This projects purpose is to learn Rust for me.
   <tr>
     <td>
 
-**Before**
+**Source**
 
 ![Before Image](examples/horse.jpeg)
 
@@ -24,7 +24,13 @@ This projects purpose is to learn Rust for me.
 ![After Image](examples/horse_res32_nearest.jpeg)
 
 </td>
+<td>
 
+**Average Area (Resolution 32)**
+
+![After Image](examples/horse_res32_average.jpeg)
+
+</td>
   </tr>
 </table>
 
