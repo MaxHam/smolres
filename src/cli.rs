@@ -7,22 +7,22 @@ use std::path::{Path, PathBuf};
 #[command(name = "smolres")]
 #[command(version, about)]
 pub struct Args {
-    // Path to input image file
+    /// Path to input image file
     #[arg(short, long, value_parser=validate_input_path)]
     pub input: PathBuf,
 
-    // Path to output image file
+    /// Path to output image file
     #[arg(short, long, value_parser=validate_output_path)]
     pub output: Option<PathBuf>,
 
-    // Scale of virtualized resolution
+    /// Scale of virtualized resolution
     #[arg(short, long, default_value_t = 16)]
     pub resolution: u16,
-    // Color depth of individual pixelds
+    /// Color depth of individual pixelds
     #[arg(short, long, default_value_t = 8, value_parser=validate_bit_depth)]
     pub bit_depth: u8,
 
-    // Algorithm to be used for the pixel interpolation
+    /// Algorithm to be used for the pixel interpolation
     #[arg(short, long)]
     pub algorithm: Option<Algorithm>,
 }
