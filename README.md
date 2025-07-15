@@ -8,7 +8,7 @@ This projects purpose is to learn Rust for me.
 
 ## Example
 
-<table>
+<table style="width: 100%; table-layout: fixed;">
   <tr>
     <td>
 
