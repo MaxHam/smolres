@@ -59,11 +59,10 @@ smolres --input ./data/input_image.jpeg --resolution 32
 - [x] Implement pixelation algorithm (downscale to a virtual grid, then upscale).
 - [x] Implement output saving (as JPEG).
 - [x] Handle basic error cases (invalid files, missing arguments).
-- [ ] Implement bit-depth reduction (2-bit, 4-bit color quantization).
+- [x] Implement bit-depth reduction (2-bit, 4-bit color quantization).
 
 ### Advanced features
 
 - [ ] Add batch processing (process an entire folder of images).
-- [ ] Add progress bar (using indicatif).
 - [ ] Add other interpolation algorithms
 - [ ] Add other file types .png, .jpg, ..

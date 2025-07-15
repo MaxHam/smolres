@@ -53,8 +53,11 @@ fn main() -> Result<(), UserFacingError> {
 #[cfg(test)]
 mod tests {
 
+    use jpeg_decoder::Decoder;
+
     use crate::cli::{Algorithm, Args};
     use crate::run;
+    use std::fs::File;
     use std::path::PathBuf;
     use std::{env, fs};
 
@@ -71,18 +74,30 @@ mod tests {
             algorithm: Some(Algorithm::AverageArea),
         };
 
-        // Run the main logic
         run(args).expect("run() should succeed");
 
-        // Verify output exists
         assert!(output_path.exists(), "Output image was not created");
+
+        let mut input_file = File::open(&input_path).expect("Failed to open input image");
+        let mut decoder = Decoder::new(&mut input_file);
+        let input_pixels = decoder.decode().expect("Failed to decode input image");
+
+        let mut output_file = File::open(&output_path).expect("Failed to open output image");
+        let mut decoder_out = Decoder::new(&mut output_file);
+        let output_pixels = decoder_out.decode().expect("Failed to decode output image");
+        assert_eq!(
+            input_pixels.len(),
+            output_pixels.len(),
+            "Input and output images have different pixel counts"
+        );
+
         // Clean up
         fs::remove_file(output_path).unwrap();
     }
 
     #[test]
     fn test_run_method_nearest_neighbor() {
-        let input_path = PathBuf::from("examples/horse_3.jpeg"); // Ensure this file exists
+        let input_path = PathBuf::from("examples/horse.jpeg"); // Ensure this file exists
         let temp_dir = env::temp_dir();
         let output_path = temp_dir.join("output.jpeg");
         let args = Args {
@@ -93,11 +108,24 @@ mod tests {
             algorithm: Some(Algorithm::Nearestneighbor),
         };
 
-        // Run the main logic
         run(args).expect("run() should succeed");
 
-        // Verify output exists
         assert!(output_path.exists(), "Output image was not created");
+
+        let mut input_file = File::open(&input_path).expect("Failed to open input image");
+        let mut decoder = Decoder::new(&mut input_file);
+        let input_pixels = decoder.decode().expect("Failed to decode input image");
+
+        let mut output_file = File::open(&output_path).expect("Failed to open output image");
+        let mut decoder_out = Decoder::new(&mut output_file);
+        let output_pixels = decoder_out.decode().expect("Failed to decode output image");
+
+        assert_eq!(
+            input_pixels.len(),
+            output_pixels.len(),
+            "Input and output images have different pixel counts"
+        );
+
         // Clean up
         fs::remove_file(output_path).unwrap();
     }
