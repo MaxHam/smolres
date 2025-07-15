@@ -19,9 +19,9 @@ This projects purpose is to learn Rust for me.
 </td>
 <td>
 
-**After (Resolution 32)**
+**Nearest Neighbor (Resolution 32)**
 
-![After Image](examples/horse_3_res32.jpeg)
+![After Image](examples/horse_res32_nearest.jpeg.jpeg)
 
 </td>
 
