@@ -8,31 +8,7 @@ This projects purpose is to learn Rust for me.
 
 ## Example
 
-<table style="width: 100%; table-layout: fixed;">
-  <tr>
-    <td>
-
-**Source**
-
-![Before Image](examples/horse.jpeg)
-
-</td>
-<td>
-
-**Nearest Neighbor (Resolution 32)**
-
-![After Image](examples/horse_res32_nearest.jpeg)
-
-</td>
-<td>
-
-**Average Area (Resolution 32)**
-
-![After Image](examples/horse_res32_average.jpeg)
-
-</td>
-  </tr>
-</table>
+![Source vs. Average Area (Resolution 32)](examples/horse_hardcuts.jpeg)
 
 ## How to install
 
